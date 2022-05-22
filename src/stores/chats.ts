@@ -7,6 +7,7 @@ export const useChatsStore = defineStore({
   id: "chats",
   state: () => ({
     activeChats: [],
+    selectedChat: null,
   }),
   getters: {
     getActiveChats: (state) => state.activeChats,

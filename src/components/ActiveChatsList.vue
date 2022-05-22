@@ -1,18 +1,20 @@
 <template>
-  <main>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <chat-item-vue
-            :key="chat.id"
-            :customer-name="chat.customer || 'Cliente'"
-            :session-start="chat.created_at"
-            v-for="chat in (chats as Chat[])"
-          ></chat-item-vue>
-        </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        <chat-item-vue
+          :key="chat.id"
+          :customer-name="chat.customer || 'Cliente'"
+          :session-start="chat.created_at"
+          :chat-id="chat.id"
+          v-for="chat in (chats as Chat[])"
+        ></chat-item-vue>
+      </div>
+      <div class="col-md-6">
+        <router-view></router-view>
       </div>
     </div>
-  </main>
+  </div>
 </template>
 <script lang="ts" setup>
 import { onMounted, ref, computed } from "vue";
