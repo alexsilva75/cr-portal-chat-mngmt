@@ -22,5 +22,13 @@ export const useChatsStore = defineStore({
       this.activeChats = response.data.connections;
       console.log("Active chats", response);
     },
+
+    async fetchChatMessages(chatId: number) {
+      const response = await axios.get(
+        `${options.baseURL}/api/v1/chat/${chatId}`
+      );
+
+      this.selectedChat = response.data.chat;
+    },
   },
 });
