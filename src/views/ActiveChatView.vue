@@ -99,15 +99,15 @@ function createMessage(messageText: string, messageType: string) {
   return message;
 }
 
-function update() {
-  store.fetchChatMessages(+props.chatId!);
+async function update() {
+  await store.fetchChatMessages(+props.chatId!);
   console.log("Selected Chat: ", selectedChat.value);
   createChat();
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (selectedChat) {
-    update();
+    await update();
   }
 });
 
