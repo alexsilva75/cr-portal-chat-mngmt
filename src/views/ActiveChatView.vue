@@ -1,13 +1,29 @@
 <template>
-  <div class="container">
-    <h1>Atendimento nº: {{ chatId }}</h1>
-    <div
-      class="min-vh-75 chat-container d-flex flex-column justify-content-around"
-    >
-      <div
-        v-if="selectedChat"
-        class="chat-panel d-flex flex-column justify-content-end"
-      >
+  <div class="card direct-chat direct-chat-primary">
+    <div class="card-header">
+      <h3 class="card-title">Atendimento nº: {{ chatId }}</h3>
+      <div class="card-tools">
+        <span title="3 New Messages" class="badge badge-primary">3</span>
+        <button type="button" class="btn btn-tool" data-card-widget="collapse">
+          <i class="fas fa-minus"></i>
+        </button>
+        <button
+          type="button"
+          class="btn btn-tool"
+          title="Contacts"
+          data-widget="chat-pane-toggle"
+        >
+          <i class="fas fa-comments"></i>
+        </button>
+        <button type="button" class="btn btn-tool" data-card-widget="remove">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+    <!-- //card-header -->
+
+    <div class="card-body">
+      <div v-if="selectedChat" class="direct-chat-messages">
         <chat-message-vue
           class="mb-2"
           :key="message.id"
@@ -16,19 +32,19 @@
           :sender="message.sender_type"
         ></chat-message-vue>
       </div>
-
-      <div class="chat-form-holder p-3 mb-2">
-        <form @submit.prevent="sendMessage">
-          <div class="py-3 d-flex">
-            <input
-              type="text"
-              v-model="messageText"
-              class="form-control"
-            /><button class="btn btn-primary">Enviar</button>
-          </div>
-        </form>
-      </div>
     </div>
+    <!-- //card-body -->
+    <div class="card-footer">
+      <form @submit.prevent="sendMessage">
+        <div class="input-group">
+          <input type="text" v-model="messageText" class="form-control" />
+          <span class="input-group-append">
+            <button class="btn btn-primary">Enviar</button>
+          </span>
+        </div>
+      </form>
+    </div>
+    <!-- //card-footer -->
   </div>
 </template>
 <script lang="ts" setup>
@@ -66,7 +82,8 @@ const { selectedChat } = storeToRefs(store)!;
 const route = useRoute();
 
 function createChat() {
-  if (!sockets[`${(selectedChat as unknown as Chat).id}`]) {
+  const socketId = `${(selectedChat.value as unknown as Chat).id}`;
+  if (!(socketId in sockets)) {
     const socket = new WebSocket("ws://localhost:8090");
     socket.addEventListener("open", function (event) {
       socket.send(JSON.stringify(createMessage("attendant", "opening")));
@@ -83,8 +100,27 @@ function createChat() {
       }
     });
 
-    sockets[`${(selectedChat as unknown as Chat).id}`] = socket;
+    sockets[`${(selectedChat.value as unknown as Chat).id}`] = socket;
+    console.log("Active Sockets: ", sockets);
   }
+}
+
+async function sendMessage() {
+  console.log("Sending message...", selectedChat.value);
+  sockets[`${(selectedChat.value as unknown as Chat).id}`].send(
+    JSON.stringify(createMessage(messageText.value, "chat"))
+  );
+  messageText.value = "";
+  //update();
+  await store.fetchChatMessages(+props.chatId!);
+  scrollToView();
+}
+
+function scrollToView() {
+  const chatMessagesContainerel = document.querySelector(
+    ".direct-chat-messages"
+  )! as HTMLElement;
+  chatMessagesContainerel?.lastElementChild?.scrollIntoView();
 }
 
 function createMessage(messageText: string, messageType: string) {
@@ -102,13 +138,13 @@ function createMessage(messageText: string, messageType: string) {
 async function update() {
   await store.fetchChatMessages(+props.chatId!);
   console.log("Selected Chat: ", selectedChat.value);
-  createChat();
+  scrollToView();
+  //createChat();
 }
 
 onMounted(async () => {
-  if (selectedChat) {
-    await update();
-  }
+  await update();
+  await createChat();
 });
 
 watch(
@@ -122,17 +158,13 @@ watch(
   () => selectedChat,
   (newSelectedChat) => {
     if (newSelectedChat) {
+      createChat();
       update();
     }
   }
 );
-function sendMessage() {
-  console.log("Sending message...");
-  sockets[`${(selectedChat as unknown as Chat).id}`].send(
-    JSON.stringify(createMessage(messageText.value, "chat"))
-  );
-}
 </script>
+
 <style scoped>
 .min-vh-75 {
   min-height: 75vh;

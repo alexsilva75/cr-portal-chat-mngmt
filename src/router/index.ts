@@ -3,6 +3,7 @@ import HomeView from "../views/HomeView.vue";
 import DashboardViewVue from "@/views/DashboardView.vue";
 import ActiveChatView from "@/views/ActiveChatView.vue";
 import { useAuthStore } from "@/stores/auth";
+import ActiveChatsListView from "@/views/ActiveChatsListView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,11 @@ const router = createRouter({
       component: DashboardViewVue,
       meta: { requiresAuth: true },
       children: [
+        {
+          path: "active-chats",
+          name: "active-chats",
+          component: ActiveChatsListView,
+        },
         {
           path: "active-chat/:chatId",
           name: "active-chat",
@@ -48,6 +54,9 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !store.isLoggedIn) {
     next("/login");
   } else {
+    if ((to.name === "login" || to.name === "home") && store.isLoggedIn) {
+      next("dashboard");
+    }
     next();
   }
 });

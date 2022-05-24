@@ -48,7 +48,7 @@ watch(
     console.log("isLoggedIn changed...", newValue);
     if (newValue) {
       console.log("You are logged in!");
-      router.replace("/dashboard");
+      router.replace("/dashboard/active-chats");
     }
   }
 );
