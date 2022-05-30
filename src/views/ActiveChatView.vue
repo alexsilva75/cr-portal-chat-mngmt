@@ -84,7 +84,7 @@ const route = useRoute();
 function createChat() {
   const socketId = `${(selectedChat.value as unknown as Chat).id}`;
   if (!(socketId in sockets)) {
-    const socket = new WebSocket("ws://localhost:8090");
+    const socket = new WebSocket("wss://hm.portalcrtelecom.com.br/chat");
     socket.addEventListener("open", function (event) {
       socket.send(JSON.stringify(createMessage("attendant", "opening")));
     });
