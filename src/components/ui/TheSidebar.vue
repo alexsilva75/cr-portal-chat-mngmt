@@ -18,7 +18,7 @@
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
           <img
-            src="dist/img/circle-user-solid.svg"
+            src="/dist/img/circle-user-solid.svg"
             class="img-circle elevation-2"
             alt="User Image"
           />
@@ -60,7 +60,7 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <RouterLink class="nav-link" to="/dashboard/profile">
+                <RouterLink class="nav-link" to="/dashboard">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Perfil</p>
                 </RouterLink>
@@ -91,14 +91,14 @@
             </a>
             <ul class="nav nav-treeview">
               <li class="nav-item">
-                <RouterLink to="/dashboard/mailbox" class="nav-link">
+                <RouterLink to="/dashboard" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Caixa de Entrada</p>
                 </RouterLink>
               </li>
 
               <li class="nav-item">
-                <a href="pages/mailbox/read-mail.html" class="nav-link">
+                <a href="#" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Lidas</p>
                 </a>
