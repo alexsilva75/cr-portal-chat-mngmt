@@ -120,6 +120,10 @@ import { useAuthStore } from "@/stores/auth";
 const store = useAuthStore();
 
 const { authUser } = storeToRefs(store);
+
+async function logout() {
+  await store.logout();
+}
 // import { defineComponent, ref } from "vue";
 // // import { mapGetters } from "vuex";
 // export default defineComponent({

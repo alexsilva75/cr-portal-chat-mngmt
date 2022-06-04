@@ -21,12 +21,14 @@ export const useAuthStore = defineStore({
     async auth(username: string, password: string) {
       try {
         /**Obtem o cookie do servico de autenticacao do Laravel  */
-        const csrfCookieResponse = await fetch(
+        //axios.defaults.withCredentials = true;
+        const csrfCookieResponse = await axios.get(
           `${options.baseURL}/sanctum/csrf-cookie`
+          // { withCredentials: true }
         );
 
         if (csrfCookieResponse.status === 204) {
-          this.login(username, password);
+          await this.login(username, password);
         } else {
           throw new Error(`Erro ao tentar estabelecer sessão.`);
         }
@@ -38,7 +40,10 @@ export const useAuthStore = defineStore({
 
     async login(username: string, password: string) {
       try {
-        const response = (await axios
+        //axios.defaults.withCredentials = true;
+        //console.log("Axios Defaults: ", axios.defaults);
+
+        axios
           .post(
             `${options.baseURL}/login`,
             {
@@ -50,8 +55,16 @@ export const useAuthStore = defineStore({
                 Accept: "application/json",
                 "X-Requested-With": "XMLHttpRequest",
               },
+              // withCredentials: true,
             }
           )
+          .then((response) => {
+            console.log("Login Response: ", response);
+            if (response.status === 200) {
+              this.setAuthUser(response.data);
+              this.setAuthError(false);
+            }
+          })
           .catch(async (error) => {
             /**Receber um código 404 significa que o usuário já está logado e
              * o backend tentou retornar uma página home inexistente.
@@ -79,13 +92,7 @@ export const useAuthStore = defineStore({
                   this.setAuthError(true);
                 });
             }
-          })) as any;
-
-        console.log("Login Response: ", response);
-        if (response.status === 200) {
-          this.setAuthUser(response.data);
-          this.setAuthError(false);
-        }
+          });
       } catch (error) {
         console.log("Login error: ", error);
         this.setAuthError(true);
@@ -167,6 +174,30 @@ export const useAuthStore = defineStore({
       } else {
         this.logout();
       }
+    },
+
+    async fetchToken() {
+      const tokenData = await axios
+        .get(`${options.baseURL}/api/v1/token/create`, {
+          // withCredentials: true,
+        })
+        .catch((error) => {
+          console.log("Token error", error);
+        });
+
+      console.log("Token data: ", tokenData);
+    },
+
+    async fetchUser() {
+      const tokenData = await axios
+        .get(`${options.baseURL}/api/user`, {
+          // withCredentials: true,
+        })
+        .catch((error) => {
+          console.log("User error", error);
+        });
+
+      console.log("User data: ", tokenData);
     },
   },
 });

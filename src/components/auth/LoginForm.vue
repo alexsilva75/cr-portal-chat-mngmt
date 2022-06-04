@@ -23,6 +23,8 @@
               <button type="button" @click="logout" class="btn btn-warning">
                 Sair
               </button>
+              <button @click="getToken" class="btn btn-info">Token</button>
+              <button @click="getUser" class="btn btn-info">User</button>
             </form>
           </div>
         </div>
@@ -60,5 +62,13 @@ async function sendForm() {
 async function logout() {
   const response = await store.logout();
   console.log("Logout Response: ", response);
+}
+
+async function getToken() {
+  await store.fetchToken();
+}
+
+async function getUser() {
+  await store.fetchUser();
 }
 </script>
