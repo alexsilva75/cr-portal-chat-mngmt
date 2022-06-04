@@ -1,5 +1,8 @@
+import { useAuthStore } from "@/stores/auth";
 import { defineStore } from "pinia";
 import axios from "axios";
+
+const axiosInstance = axios.create({ withCredentials: true });
 
 import options from "../globalOptions";
 
@@ -15,8 +18,14 @@ export const useChatsStore = defineStore({
 
   actions: {
     async setActiveChats() {
-      const response = await axios.get(
-        `${options.baseURL}/api/v1/customers-chats`
+      const authStore = useAuthStore();
+      const response = await axiosInstance.get(
+        `${options.baseURL}/api/v1/customers-chats`,
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.authToken}`,
+          },
+        }
       );
 
       this.activeChats = response.data.connections;
@@ -24,8 +33,14 @@ export const useChatsStore = defineStore({
     },
 
     async fetchChatMessages(chatId: number) {
-      const response = await axios.get(
-        `${options.baseURL}/api/v1/chat/${chatId}`
+      const authStore = useAuthStore();
+      const response = await axiosInstance.get(
+        `${options.baseURL}/api/v1/chat/${chatId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authStore.authToken}`,
+          },
+        }
       );
 
       this.selectedChat = response.data.chat;

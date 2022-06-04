@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 import axios from "axios";
 
+//const axiosInstance = axios.create({ withCredentials: true });
+const axiosInstance = axios.create();
+
 import options from "../globalOptions";
 
 export const useAuthStore = defineStore({
@@ -22,7 +25,7 @@ export const useAuthStore = defineStore({
       try {
         /**Obtem o cookie do servico de autenticacao do Laravel  */
         //axios.defaults.withCredentials = true;
-        const csrfCookieResponse = await axios.get(
+        const csrfCookieResponse = await axiosInstance.get(
           `${options.baseURL}/sanctum/csrf-cookie`
           // { withCredentials: true }
         );
@@ -40,12 +43,9 @@ export const useAuthStore = defineStore({
 
     async login(username: string, password: string) {
       try {
-        //axios.defaults.withCredentials = true;
-        //console.log("Axios Defaults: ", axios.defaults);
-
-        axios
+        const response = (await axios
           .post(
-            `${options.baseURL}/login`,
+            `${options.baseURL}/api/v1/auth`,
             {
               username,
               password,
@@ -55,16 +55,8 @@ export const useAuthStore = defineStore({
                 Accept: "application/json",
                 "X-Requested-With": "XMLHttpRequest",
               },
-              // withCredentials: true,
             }
           )
-          .then((response) => {
-            console.log("Login Response: ", response);
-            if (response.status === 200) {
-              this.setAuthUser(response.data);
-              this.setAuthError(false);
-            }
-          })
           .catch(async (error) => {
             /**Receber um código 404 significa que o usuário já está logado e
              * o backend tentou retornar uma página home inexistente.
@@ -74,7 +66,7 @@ export const useAuthStore = defineStore({
             console.log("Login Error: ", error);
             if (error.response.status === 404) {
               await this.logout();
-              const response = await axios
+              const response = await axiosInstance
                 .post(
                   `${options.baseURL}/login`,
                   {
@@ -92,7 +84,13 @@ export const useAuthStore = defineStore({
                   this.setAuthError(true);
                 });
             }
-          });
+          })) as any;
+
+        console.log("Login Response: ", response);
+        if (response.status === 200) {
+          this.setAuthUser(response.data);
+          this.setAuthError(false);
+        }
       } catch (error) {
         console.log("Login error: ", error);
         this.setAuthError(true);
@@ -121,7 +119,7 @@ export const useAuthStore = defineStore({
     },
 
     async logout() {
-      const response = await axios
+      const response = await axiosInstance
         .post(`${options.baseURL}/logout`, {})
         .catch((_) => {
           localStorage.clear();
@@ -177,27 +175,15 @@ export const useAuthStore = defineStore({
     },
 
     async fetchToken() {
-      const tokenData = await axios
+      const tokenData = await axiosInstance
         .get(`${options.baseURL}/api/v1/token/create`, {
-          // withCredentials: true,
+          withCredentials: true,
         })
         .catch((error) => {
           console.log("Token error", error);
         });
 
       console.log("Token data: ", tokenData);
-    },
-
-    async fetchUser() {
-      const tokenData = await axios
-        .get(`${options.baseURL}/api/user`, {
-          // withCredentials: true,
-        })
-        .catch((error) => {
-          console.log("User error", error);
-        });
-
-      console.log("User data: ", tokenData);
     },
   },
 });

@@ -9,8 +9,8 @@ const translateMailErrors: translateObjectType = {
 };
 
 export default {
-  //baseURL: "http://localhost:8000",
-  baseURL: "https://hm.portalcrtelecom.com.br",
+  baseURL: "http://localhost:8000",
+  //baseURL: "https://hm.portalcrtelecom.com.br",
 
   translate: {
     apiErrors: {

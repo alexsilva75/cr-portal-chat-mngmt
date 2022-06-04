@@ -11,7 +11,7 @@ import router from "./router";
 
 const app = createApp(App);
 
-axios.defaults.withCredentials = true;
+//axios.defaults.withCredentials = true;
 
 const pinia = createPinia();
 

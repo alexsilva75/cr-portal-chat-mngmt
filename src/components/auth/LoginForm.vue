@@ -56,7 +56,7 @@ watch(
 );
 
 async function sendForm() {
-  await store.auth(username.value, password.value);
+  await store.login(username.value, password.value);
 }
 
 async function logout() {
@@ -66,9 +66,5 @@ async function logout() {
 
 async function getToken() {
   await store.fetchToken();
-}
-
-async function getUser() {
-  await store.fetchUser();
 }
 </script>
